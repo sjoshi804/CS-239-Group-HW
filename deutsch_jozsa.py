@@ -1,84 +1,114 @@
 import numpy as np
+import time
+import random
+
 from pyquil import Program, get_qc
 from pyquil.gates import *
 from pyquil.quil import DefGate
 from pyquil.quilatom import unpack_qubit
+from pyquil.api import local_forest_runtime
 
 from typing import Dict
 
-def create_Uf(mappings: Dict[str, str]) -> np.ndarray:
-        
-        num_qubits = int(np.log2(len(mappings)))
-        bitsum = sum([int(bit) for bit in mappings.values()])
+#Converts integer to bit string of specified length
+def get_bit_string(num, lngt):
+	return bin(num)[2:].zfill(lngt)
 
-        #Checking whether the given mapping is either constant or balanced
-        if(not(bitsum == 0 or bitsum == 2 ** (num_qubits - 1) or bitsum == 2 ** num_qubits)):
-            raise ValueError("f(x) must be constant or balanced")
+class DeutschJozsa:
 
-        val = 2 ** (num_qubits + 1)
+	def __init__(self, mapping):
+		self.__mapping = mapping
+		self.__num_qubits = int(np.log2(len(mappings)))
+		self.__u_f_dim = 2 ** (self.__num_qubits + 1)
+		self.__Uf = self.__create_Uf()
 
-        Uf = np.zeros((val , val)) #Creating a zero matrix of appropriate dimensions initially
+	def get_Uf(self):
+		return self.__Uf
 
-        for i in range(val): #Going over all bit strings
-            inp = bin(i)[2:].zfill(num_qubits + 1) #Converts integer to bit string of specified length
+	def __create_Uf(self) -> np.ndarray:
+	        
+	        
+	        bitsum = sum([int(bit) for bit in self.__mapping.values()])
 
-            x = inp[0:num_qubits]
-            fx = mappings[x] #fx is the output of f applied on x
+	        #Checking whether the given mapping is constant or balanced
+	        if(not(bitsum == 0 or bitsum == 2 ** (self.__num_qubits - 1) or bitsum == 2 ** self.__num_qubits)):
+	            raise ValueError("The function must be constant or balanced")
 
-            b = inp[num_qubits] #Helper qubit state initially
+	        Uf = np.zeros((self.__u_f_dim , self.__u_f_dim)) #Creating a zero matrix of appropriate dimensions initially
 
-            if b == fx:
-                bfx = '0'
-            else:
-                bfx = '1'
+	        for i in range(2 ** (self.__num_qubits + 1)): #Going over all bit strings of length num_qubits + 1
+	            inp = get_bit_string(i, self.__num_qubits + 1)
 
-            result = x + bfx #This is the resulting qubit states on applying Uf to inp
+	            x = inp[0:self.__num_qubits]
+	            fx = mappings[x] #fx is the output of f applied on x
 
-            row = i
-            col = int(result, 2)
+	            b = inp[self.__num_qubits] #Helper qubit state initially
 
-            Uf[row][col] = 1
+	            if b == fx:
+	                bfx = '0' #b^f(x)
+	            else:
+	                bfx = '1'
 
-        return Uf
+	            result = x + bfx #This is the resulting qubit states on applying Uf to inp
+
+	            row = int(result, 2) #Converting the bitstring to int
+	            col = i
+
+	            Uf[row][col] = 1 #Generating Uf based on the mapping Uf|x>|b> = |x>|b^f(x)>
+
+	        return Uf
 
 
+#Testing
 mappings = {}
 n = int(input("no. of qubits: "))
-print("Enter input, output pairs each in a line:")
-for i in range(2 ** n):
-    inp, out = input().split()
-    mappings[inp] = out
+print("Type 'y' if you want to give input-output pairs as input or type 'n' : ", end='')
+ir = input()
+if ir == 'y':
+	print("Enter space seperated input, output pairs each in a line:")
+	for i in range(2 ** n):
+	    inp, out = input().split()
+	    mappings[inp] = out
+else:
+	print("Type 'c' if you want a constant function as input or type 'b' for a random balanced function : ", end='')
+	cb = input()
+	if cb == 'c':
+		const_val = str(random.randint(0,1)) #Setting the output to either bit 0 always or 1 always
+		for i in range(2 ** n):
+			mappings[get_bit_string(i, n)] = const_val
+	else:
+		#Choosing a random position in the bit string and setting its value as output which will be balanced
+		rand_val = random.randint(0,n - 1)
+		for i in range(2 ** n):
+			bit_str = get_bit_string(i, n)
+			mappings[bit_str] = bit_str[rand_val]
 
-#UfMatrix = [[1, 0, 0, 0, 0, 0, 0, 0],
-#            [0, 1, 0, 0, 0, 0, 0, 0],
-#            [0, 0, 1, 0, 0, 0, 0, 0],
-#            [0, 0, 0, 1, 0, 0, 0, 0],
-#            [0, 0, 0, 0, 0, 1, 0, 0],
-#            [0, 0, 0, 0, 1, 0, 0, 0],
-#            [0, 0, 0, 0, 0, 0, 0, 1],
-#            [0, 0, 0, 0, 0, 0, 1, 0]]
 
-UfMatrix = create_Uf(mappings)
-print(UfMatrix)
+UfMatrix = DeutschJozsa(mappings).get_Uf()
 
+#Creating the program
 prog = Program()
 
-prog += X(n)
+prog += X(n) #Setting helper qubit state to 1
 
 for i in range(n + 1):
-    prog += H(i)
+    prog += H(i) #Applying Hadamard to all qubits
 
 u_f_def = DefGate("Uf", UfMatrix)
 qubits = [unpack_qubit(i) for i in range(n + 1)]
-prog += Program(u_f_def, Gate("Uf", [], qubits))
+prog += Program(u_f_def, Gate("Uf", [], qubits)) #Applying Uf
 
 for i in range(n):
-    prog += H(i)
+    prog += H(i) #Applying Hadamard to computational qubits i.e without helper bit
 
 qc_name = "{}q-qvm".format(n + 1)
-qc = get_qc(qc_name)
 trails = 10
-result = qc.run_and_measure(prog, 10)
+
+with local_forest_runtime():
+	time.sleep(1)
+	qc = get_qc(qc_name)
+	qc.compiler.client.timeout = 20000
+	result = qc.run_and_measure(prog, 1) #Trails is currently set to 1
 
 isConstant = True
 
