@@ -1,9 +1,21 @@
 import numpy as np
+import time
+import random
 
 from pyquil import get_qc, Program
 from pyquil.quil import DefGate
 from pyquil.gates import *
 from pyquil.api import local_forest_runtime
+
+def timer(original_function):
+    def wrapper_function(*args,**kwargs):
+        start=time.time()
+        result=original_function(*args,**kwargs)
+        stop=time.time()
+        diff=stop-start
+        print('{} took {} seconds\n'.format(original_function.__name__,diff))
+        return result
+    return wrapper_function
 
 
 class Solver(object):
@@ -76,9 +88,11 @@ class Solver(object):
         for i in range(self.k):
             self.__p+=G
     
+    @timer
     def solve(self):
         with local_forest_runtime():
             qc = get_qc('9q-square-qvm')
+            qc.compiler.client.timeout = 10000
             n_trials = 10
             result = qc.run_and_measure(self.__p, trials = self.n_trials)
         values = list()
@@ -88,11 +102,26 @@ class Solver(object):
                 value+=str(result[i][j])
             values.append(value)
         return values
-n=3
-f = lambda x: 1 if x=="101" else 0
+
+def random_bit_string_generator(n=1):
+    '''
+    Generates a random bit string of length n
+
+    Input: n (Default: n=1)
+    Output: A bit string Ex. n=7 -> "0101010"
+    '''
+    bit_string = ''
+    for i in range(0,n):
+        bit_string+=str(random.choice([0,1]))
+    return bit_string
+
+n=5
+bit_string = random_bit_string_generator(n)
+print(bit_string)
+f = lambda x: 1 if x==bit_string else 0
 
 solver = Solver(f, n)
 xs = solver.solve()
-print(xs)
+
 for idx, x in enumerate(xs):
     print("Trial {}, x: {}".format(idx, x))

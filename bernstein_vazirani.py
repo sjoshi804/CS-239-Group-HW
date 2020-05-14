@@ -1,11 +1,21 @@
 import numpy as np
 import random
+import time
 
 from pyquil import get_qc, Program
 from pyquil.quil import DefGate
 from pyquil.gates import *
 from pyquil.api import local_forest_runtime
 
+def timer(original_function):
+    def wrapper_function(*args,**kwargs):
+        start=time.time()
+        result=original_function(*args,**kwargs)
+        stop=time.time()
+        diff=stop-start
+        print('{} took {} seconds\n'.format(original_function.__name__,diff))
+        return result
+    return wrapper_function
 
 class Solver(object):
 
@@ -77,9 +87,11 @@ class Solver(object):
             self.__p += H(i)
         print(self.__p)
     
+    @timer
     def solve(self):
         with local_forest_runtime():
             qc = get_qc('9q-square-qvm')
+            qc.compiler.client.timeout = 10000
             result = qc.run_and_measure(self.__p, trials = 1)
         a = ''
         for i in range(self.n):
@@ -124,10 +136,11 @@ def addition_mod_2(x,y):
     return (x+y)%2
 
 #Test function with a completely randomized value of a and b.
-n = 3
-#random_bit_string_generator(len(x))
-#random.choice([0,1])
-f = lambda x: addition_mod_2(inner_product_mod_2("111", x), 1)
+n = 5
+
+random_bit_string = random_bit_string_generator(n)
+random_int = random.choice([0,1])
+f = lambda x: addition_mod_2(inner_product_mod_2(random_bit_string, x), 1)
 
 solver = Solver(f, n)
 a = solver.solve()
