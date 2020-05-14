@@ -4,22 +4,24 @@
 
 ### Overview
 
-The code here is organized as a function that creates the unitary matrix U_f 
+The code here is organized as a class with a function that creates the unitary matrix U_f 
 given a function f that is either constant or balanced and the rest of the code 
 functions as interactive script that lets you enter in all input output pairs 
-in order to create the function f (represented as a python dictionary). The 
-output is a final print statement to console that tells us whether the function 
+in order to create the function f (represented as a python dictionary) or you can 
+let the script choose a random constant or balanced function. The output is a 
+final print statement to console that tells us whether the function 
 is balanced or constant. 
 
 ### Input 
 
-The input is first the number of bit the function operates on and then the 
-input output pairs that specify the function and is parsed from console. The 
-format is as shown in the example below. 
+The input is first the number of bits the function operates on. Then you can choose 
+to give input output pairs that specify the function or let the program choose a 
+random constant or balanced function. The format is as shown in the example below. 
 
 An example of this is: 
 ```
 no. of qubits: 2
+Type 'y' if you want to give input-output pairs as input or type 'n' : y
 Enter input, output pairs each in a line:
 00 0
 01 1
@@ -41,19 +43,11 @@ trial that the quantum algorithm was run for.
 However, the final output which is the answer to the question whether or not 
 the function f is balanced is printed at the very end with 'Balanced' to 
 indicate that the function is indeed balanced and 'Constant' to indicate that 
-is constant. 
+is constant. Also the no.of trails is set to one in the submission.
 
 An example of the output: 
 
 ```
-[[1. 0. 0. 0. 0. 0. 0. 0.]
- [0. 1. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 1. 0. 0. 0. 0.]
- [0. 0. 1. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 0. 1. 0. 0.]
- [0. 0. 0. 0. 1. 0. 0. 0.]
- [0. 0. 0. 0. 0. 0. 1. 0.]
- [0. 0. 0. 0. 0. 0. 0. 1.]]
 State of qubits without helper qubit in each trail
 0 : 11
 1 : 11
@@ -66,29 +60,20 @@ State of qubits without helper qubit in each trail
 8 : 11
 9 : 11
 Balanced
-```
-
-Note that the final output answering the question this algorithm was meant to 
-ask is given on the final line. 
+``` 
 
 ### Example Usage
 
 ```
 sjoshi@Siddharths-MacBook-Air pyquil % python3 deutsch_jozsa.py 
 no. of qubits: 2
+Type 'y' if you want to give input-output pairs as input or type 'n' : y
 Enter input, output pairs each in a line:
 00 0
 01 1
 10 1
 11 0
-[[1. 0. 0. 0. 0. 0. 0. 0.]
- [0. 1. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 1. 0. 0. 0. 0.]
- [0. 0. 1. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 0. 1. 0. 0.]
- [0. 0. 0. 0. 1. 0. 0. 0.]
- [0. 0. 0. 0. 0. 0. 1. 0.]
- [0. 0. 0. 0. 0. 0. 0. 1.]]
+
 State of qubits without helper qubit in each trail
 0 : 11
 1 : 11
