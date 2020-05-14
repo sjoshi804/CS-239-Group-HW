@@ -8,6 +8,9 @@ from pyquil.gates import *
 from pyquil.api import local_forest_runtime
 
 def timer(original_function):
+    '''
+    A decorator function to time a function.
+    '''
     def wrapper_function(*args,**kwargs):
         start=time.time()
         result=original_function(*args,**kwargs)
@@ -19,7 +22,12 @@ def timer(original_function):
 
 class Solver(object):
 
-    def __init__(self, f, n):   
+    def __init__(self, f, n):
+        '''
+        Initialize the class
+
+        Input: function, number of qubits.
+        '''   
         self.f = f
         self.n = n
 
@@ -38,6 +46,10 @@ class Solver(object):
             return ["0"+x for x in self.__generate_bit_strings(n-1)]+["1"+x for x in self.__generate_bit_strings(n-1)]
 
     def __get_tensor(self, bit_string):
+        '''
+        Using the tensor product, get the matrix
+        for a bit string representing qubits.
+        '''
         if bit_string=="0":
             return np.array([1,0], dtype=np.int16)
         elif bit_string=='1':
@@ -46,6 +58,10 @@ class Solver(object):
             return np.tensordot(self.__get_tensor(bit_string[0]), self.__get_tensor(bit_string[1:]), 0).ravel().reshape(2**len(bit_string), -1)
 
     def __modify_bit_string(self, bit_string):
+        '''
+        Modify bit string representing a set of qubits
+        when U_f is applied to it.
+        '''
         res = self.f(bit_string[:-1])
         if res==0:
             return bit_string
@@ -56,6 +72,14 @@ class Solver(object):
                 return bit_string[:-1]+"0"
 
     def __produce_u_f_gate(self):
+        '''
+        Solve a linear system of equations using
+        the mapping between the input and the output
+        to get the U_f matrix.
+
+        Produce the gate to be used in the circuit using
+        the matrix.
+        '''
         bit_strings = self.__generate_bit_strings(self.n+1)
         xs = list()
         bs = list()
@@ -75,6 +99,10 @@ class Solver(object):
         self.__U_f = self.__u_f_definition.get_constructor()
         
     def __build_circuit(self):
+        '''
+        Build the quantum circuit for
+        the Bernstein-Vazirani algorithm.
+        '''
         self.__produce_u_f_gate()
         
         self.__p = Program()
@@ -89,6 +117,9 @@ class Solver(object):
     
     @timer
     def solve(self):
+        '''
+        Run and measure the quantum circuit and return the results.
+        '''
         with local_forest_runtime():
             qc = get_qc('9q-square-qvm')
             qc.compiler.client.timeout = 10000
@@ -135,11 +166,13 @@ def addition_mod_2(x,y):
     #x, y are bits which are integers 0 or 1
     return (x+y)%2
 
+
 #Test function with a completely randomized value of a and b.
 n = 5
-
 random_bit_string = random_bit_string_generator(n)
 random_int = random.choice([0,1])
+
+#Test function
 f = lambda x: addition_mod_2(inner_product_mod_2(random_bit_string, x), 1)
 
 solver = Solver(f, n)
