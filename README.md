@@ -43,7 +43,7 @@ trial that the quantum algorithm was run for.
 However, the final output which is the answer to the question whether or not 
 the function f is balanced is printed at the very end with 'Balanced' to 
 indicate that the function is indeed balanced and 'Constant' to indicate that 
-is constant. Also the no.of trails is set to one in the submission.
+is constant. Also the no. of trails is set to one in the submission.
 
 An example of the output: 
 
