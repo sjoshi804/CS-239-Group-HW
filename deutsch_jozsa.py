@@ -102,18 +102,18 @@ for i in range(n):
     prog += H(i) #Applying Hadamard to computational qubits i.e without helper bit
 
 qc_name = "{}q-qvm".format(n + 1)
-trails = 10
+trials = 1
 
 with local_forest_runtime():
 	time.sleep(1)
 	qc = get_qc(qc_name)
 	qc.compiler.client.timeout = 20000
-	result = qc.run_and_measure(prog, 1) #Trails is currently set to 1
+	result = qc.run_and_measure(prog, trials) #Trials is currently set to 1
 
 isConstant = True
 
-print("State of qubits without helper qubit in each trail")
-for j in range(trails):
+print("State of qubits without helper qubit in each trial")
+for j in range(trials):
     print(j, ": ", end='')
     for i in range(n):
         if(result[i][j] != 0):
