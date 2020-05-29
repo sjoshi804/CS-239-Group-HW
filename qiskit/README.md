@@ -215,20 +215,22 @@ to each value can check whether or not the given value is the value for which f
 
 An example output is shown here:
 ```
-['101', '101', '101', '101', '101', '101', '101', '101', '101', '101']
+{'01001': 1, '11111': 1, '10000': 998}
 ```
 
 ### Example Code
 ```
 # Test Code 
-n=3
-f = lambda x: 1 if x=="101" else 0
+n = 5
+bit_string = '10000'
+#Test function
+f = lambda x: 1 if x==bit_string else 0
 
 solver = Solver(f, n)
-xs = solver.solve()
+counts = solver.solve()
 
-for idx, x in enumerate(xs):
-    print("Trial {}, x: {}".format(idx, x))
+res = max(counts, key=counts.get)
+print("Bit string for which f is 1: {}".format(res))
 ```
 
 
