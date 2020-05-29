@@ -28,7 +28,12 @@ Enter input, output pairs each in a line:
 10 1
 11 0
 ```
-
+or
+```
+no. of qubits: 3
+Type 'y' if you want to give input-output pairs as input or type 'n' : n
+Type 'c' if you want a constant function as input or type 'b' for a random balanced function : b
+```
 ### How to Execute
 
 The program is written as a script so as soon as you enter the function in the 
@@ -48,44 +53,23 @@ is constant. Also the no. of trials is set to one in the submission.
 An example of the output: 
 
 ```
-State of qubits without helper qubit in each trail
-0 : 11
-1 : 11
-2 : 11
-3 : 11
-4 : 11
-5 : 11
-6 : 11
-7 : 11
-8 : 11
-9 : 11
-Balanced
+No. of times each state appears: {'100': 255, '101': 280, '011': 248, '010': 217}
+solve took 0.011631965637207031 seconds
+
+balanced
 ``` 
 
 ### Example Usage
 
 ```
 sjoshi@Siddharths-MacBook-Air pyquil % python3 deutsch_jozsa.py 
-no. of qubits: 2
-Type 'y' if you want to give input-output pairs as input or type 'n' : y
-Enter input, output pairs each in a line:
-00 0
-01 1
-10 1
-11 0
+no. of qubits: 3
+Type 'y' if you want to give input-output pairs as input or type 'n' : n
+Type 'c' if you want a constant function as input or type 'b' for a random balanced function : b
+No. of times each state appears: {'100': 255, '101': 280, '011': 248, '010': 217}
+solve took 0.011631965637207031 seconds
 
-State of qubits without helper qubit in each trail
-0 : 11
-1 : 11
-2 : 11
-3 : 11
-4 : 11
-5 : 11
-6 : 11
-7 : 11
-8 : 11
-9 : 11
-Balanced
+balanced
 ```
 
 ## Bernstein-Vazirani Algorithm
