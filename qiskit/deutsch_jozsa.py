@@ -97,7 +97,7 @@ class DeutschJozsa:
 
 		# Returns counts
 		counts = result.get_counts(self.__circuit)
-		#print("No. of times each state appears:",counts)
+		print("No. of times each state appears:",counts)
 
 		return counts
 
