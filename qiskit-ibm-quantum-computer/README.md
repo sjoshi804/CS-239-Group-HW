@@ -1,5 +1,8 @@
 # README
 
+## API KEY
+The API KEY of the IBMQ account is needed to run on the quantum computer and in every program, the solve function contains the API CREDENTIAL field which can be changed and the backend can also be modified there.
+
 ## Deutsch-Jozsa Algorithm
 
 ### Overview
