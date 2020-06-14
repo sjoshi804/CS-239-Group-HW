@@ -168,7 +168,7 @@ produce_z_0_gate, produce_z_f_gate, produce_negative_gate, build_circuit and
 solve. However, all functions except solve are private and cannot be accessed 
 by the user in order to hide information about the function f Nonetheless, the 
 only function a user needs to use is solve() which would give the solution to 
-the particular instantiation of the Grover Search problem. 
+the particular instantiation of the Grover Search problem. The API key for accessing the IBM quantum computer is assigned as a class variable. 
 
 An example of how to use this method is shown here:
 ```
@@ -188,20 +188,23 @@ to each value can check whether or not the given value is the value for which f
 
 An example output is shown here:
 ```
-['101', '101', '101', '101', '101', '101', '101', '101', '101', '101']
+{'111': 60, '101': 81, '000': 214, '011': 143, '010': 149, '110': 67, '001': 176, '100': 110}
 ```
 
 ### Example Code
 ```
-# Test Code 
-n=3
-f = lambda x: 1 if x=="101" else 0
+n = 3
+bit_string = random_bit_string_generator(n)
+print("Original Bit String: {}".format(bit_string))
+#Test function
+f = lambda x: 1 if x==bit_string else 0
 
 solver = Solver(f, n)
-xs = solver.solve()
+counts, time_taken = solver.solve()
 
-for idx, x in enumerate(xs):
-    print("Trial {}, x: {}".format(idx, x))
+res = max(counts, key=counts.get)
+print("Bit string for which f is 1: {}".format(res))
+print("TIme taken for circuit to run: {}".format(time_taken))
 ```
 
 
