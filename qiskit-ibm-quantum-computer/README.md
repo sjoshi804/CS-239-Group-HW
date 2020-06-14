@@ -20,11 +20,18 @@ format is as shown in the example below.
 An example of this is: 
 ```
 no. of qubits: 2
+Type 'y' if you want to give input-output pairs as input or type 'n' : y
 Enter input, output pairs each in a line:
 00 0
 01 1
 10 1
 11 0
+```
+or
+```
+no. of qubits: 3
+Type 'y' if you want to give input-output pairs as input or type 'n' : n
+Type 'c' if you want a constant function as input or type 'b' for a random balanced function : b
 ```
 
 ### How to Execute
@@ -46,27 +53,10 @@ is constant.
 An example of the output: 
 
 ```
-[[1. 0. 0. 0. 0. 0. 0. 0.]
- [0. 1. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 1. 0. 0. 0. 0.]
- [0. 0. 1. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 0. 1. 0. 0.]
- [0. 0. 0. 0. 1. 0. 0. 0.]
- [0. 0. 0. 0. 0. 0. 1. 0.]
- [0. 0. 0. 0. 0. 0. 0. 1.]]
-State of qubits without helper qubit in each trail
-0 : 11
-1 : 11
-2 : 11
-3 : 11
-4 : 11
-5 : 11
-6 : 11
-7 : 11
-8 : 11
-9 : 11
-Balanced
-```
+No. of times each state appears: {'100': 255, '101': 280, '011': 248, '010': 217}
+
+balanced
+``` 
 
 Note that the final output answering the question this algorithm was meant to 
 ask is given on the final line. 
@@ -75,32 +65,12 @@ ask is given on the final line.
 
 ```
 sjoshi@Siddharths-MacBook-Air pyquil % python3 deutsch_jozsa.py 
-no. of qubits: 2
-Enter input, output pairs each in a line:
-00 0
-01 1
-10 1
-11 0
-[[1. 0. 0. 0. 0. 0. 0. 0.]
- [0. 1. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 1. 0. 0. 0. 0.]
- [0. 0. 1. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 0. 1. 0. 0.]
- [0. 0. 0. 0. 1. 0. 0. 0.]
- [0. 0. 0. 0. 0. 0. 1. 0.]
- [0. 0. 0. 0. 0. 0. 0. 1.]]
-State of qubits without helper qubit in each trail
-0 : 11
-1 : 11
-2 : 11
-3 : 11
-4 : 11
-5 : 11
-6 : 11
-7 : 11
-8 : 11
-9 : 11
-Balanced
+no. of qubits: 3
+Type 'y' if you want to give input-output pairs as input or type 'n' : n
+Type 'c' if you want a constant function as input or type 'b' for a random balanced function : b
+No. of times each state appears: {'100': 255, '101': 280, '011': 248, '010': 217}
+
+balanced
 ```
 
 ## Bernstein-Vazirani Algorithm
@@ -117,7 +87,7 @@ found easily by one call to the function on a classical computer.
 ### Input
 In particular:
 ``` 
-Solver(f, n)
+BernsteinVazirani(f, n)
 ```
 where:
 
@@ -139,7 +109,7 @@ instantiation of the Bernstein Vazirani problem.
 
 An example of how to use this method is shown here:
 ```
-solver = Solver(f, n)
+solver = BernsteinVazirani(f, n)
 solution = solver.solve()
 ```
 
@@ -160,7 +130,7 @@ An example output is shown here:
 n = 3
 f = lambda x: addition_mod_2(inner_product_mod_2("111", x), 1)
 
-solver = Solver(f, n)
+solver = BernsteinVazirani(f, n)
 a = solver.solve()
 print('Value of a: {}'.format(a))
 print('Value of b: {}'.format(f("0"*n)))
